@@ -38,7 +38,7 @@ HTML;
 	$content = implode('', $content);
 
 	$visual[$layer] = <<<HTML
-	<img src="./assets/layers/{$layer}/{$item[0]}" />
+	<img src="./assets/layers/{$layer}/{$item[0]}" class="layer-current"/>
 	<input type="hidden" name="{$layer}" value="./assets/layers/{$layer}/{$item[0]}" />
 HTML;
 
@@ -57,10 +57,29 @@ $visual = implode('' ,$visual);
 echo <<<HTML
 <link rel="stylesheet" media="screen" href="https://toolkit.chris-shaw.com/css/toolkit.css" />
 
-
+<div class="display">
 {$visual}
+</div>
+<br />
+<br />
+<br />
+<br />
+<br />
 <div class="o-tabs c-tabs">
 	{$tabs}
 	{$sections}
 </div>
+
+
+<style>
+	.display { width: 80px; marign: 200px; border: 1px solid red; }
+
+	.layer-current {
+		position: absolute;
+		top: 0;
+		left: 0;
+	}
+
+
+</style>
 HTML;
