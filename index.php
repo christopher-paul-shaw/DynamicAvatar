@@ -19,13 +19,14 @@ class DynamicAvatar {
 
 			$directory = $i->getFileName();
 			$layerDir = new DirectoryIterator($this->baseDirectory."/{$directory}");
-	
-			$items[$directory] = [];
+			$add = [];
+			ksort($layerDir);
 			foreach ($layerDir as $l) {
 				if ($l->isDot() || $l->isDir()) continue;
-				$items[$directory][] = $l->getFileName();
-
+				$add[$l->getFileName()] = $l->getFileName();
 			}
+			asort($add);
+			$items[$directory] = array_values($add);
 
 		}	
 		ksort($items);
@@ -58,7 +59,7 @@ if (isset($_POST['build'])) {
 
 
 $items = $dynamicAvatar->getWardrobe();
-
+ksort($items);
 foreach ($items as $layer => $item) {
 
 	$label = explode('-',$layer)[1];
@@ -68,17 +69,20 @@ foreach ($items as $layer => $item) {
 		</label>
 HTML;
 	$content = [];
+	asort($item);
 	foreach ($item as $item_name) {
 		$content[$item_name] = <<<HTML
 	<img src="./assets/layers/{$layer}/{$item_name}" data-target = "{$layer}" class="js-item" />
 HTML;
 
 	}	
-	asort($content);
 	$content = implode('', $content);
+
+
+
 	$visual[$layer] = <<<HTML
-	<img src="./assets/layers/{$layer}/{$item[0]}" class="layer-current"/>
-	<input type="hidden" name="layers[]" value="./assets/layers/{$layer}/{$item[0]}" />
+	<img src="./assets/layers/{$layer}/{$item[0]}" id="{$layer}_item" class="layer-current"/>
+	<input type="hidden" name="layers[]" id="{$layer}_input" value="./assets/layers/{$layer}/{$item[0]}" />
 HTML;
 
 	$sections[$layer] = <<<HTML
@@ -129,9 +133,9 @@ let items = document.querySelectorAll('.js-item');
 
 items.forEach(function(e) {
     e.addEventListener("click", function() {
-    
-    
-    	alert('x');
+	let target  = e.getAttribute('data-target'); 
+    	document.getElementById(target+'_item').src = e.src;
+    	document.getElementById(target+'_input').value = e.src;
     });
 });
 
