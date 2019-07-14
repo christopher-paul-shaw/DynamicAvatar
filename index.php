@@ -1,14 +1,11 @@
 <?php
 
-
-
 class DynamicAvatar {
 
 
 	public function __construct ($baseDirectory) {
 		$this->baseDirectory = $baseDirectory;
 	}
-
 
 	public function getWardrobe () {
 		$iterator = new DirectoryIterator($this->baseDirectory);
@@ -81,8 +78,6 @@ HTML;
 	}	
 	$content = implode('', $content);
 
-
-
 	$visual[$layer] = <<<HTML
 	<img src="./assets/layers/{$layer}/{$item[0]}" id="{$layer}_item" class="layer-current"/>
 	<input type="hidden" name="layers[]" id="{$layer}_input" value="./assets/layers/{$layer}/{$item[0]}" />
@@ -99,7 +94,6 @@ $sections = implode('', $sections);
 $visual = implode('' ,$visual);
 
 echo <<<HTML
-
 <form method="post">
 <div class="display">
 {$visual}
@@ -112,10 +106,13 @@ echo <<<HTML
 	{$tabs}
 	{$sections}
 </div>
-
-
 <style>
-
+	body {
+		width: 800px;
+		margin: auto;
+		max-width: 100%;
+		text-align: center;
+	}
 	.tab-toggle:checked + .tab {
 		display: block;
 	}
@@ -137,22 +134,15 @@ echo <<<HTML
 	}	
 	.display { display: block; position: relative; width: 80px; height: 100px; margin:  auto; border: 1px solid red; }
 	.controls { margin: 10px auto; }
-	body {
-		text-align: center;
-	}
 	.layer-current {
 		position: absolute;
 		top: 0;
 		left: 0;
 	}
-
-
 </style>
 
 <script>
 let items = document.querySelectorAll('.js-item');
-
-
 items.forEach(function(e) {
     e.addEventListener("click", function() {
 	let target  = e.getAttribute('data-target'); 
@@ -160,7 +150,5 @@ items.forEach(function(e) {
     	document.getElementById(target+'_input').value = e.src;
     });
 });
-
-
 </script>
 HTML;
