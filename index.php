@@ -132,7 +132,7 @@ echo <<<HTML
 		padding: 10px;
 		display: inline-block;
 	}	
-	.display { display: block; position: relative; width: 80px; height: 100px; margin:  auto; border: 1px solid red; }
+	.display { display: block; position: relative; width: 80px; height: 100px; margin:  auto; }
 	.controls { margin: 10px auto; }
 	.layer-current {
 		position: absolute;
