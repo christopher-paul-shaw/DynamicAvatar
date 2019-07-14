@@ -1,24 +1,63 @@
 <?php
 
 
-$iterator = new DirectoryIterator('./assets/layers');
-$layer = false;
-foreach ($iterator as $i) {
 
-	if ($i->isDot() || !$i->isDir()) continue;
+class DynamicAvatar {
 
-	$directory = $i->getFileName();
-	$layerDir = new DirectoryIterator("./assets/layers/{$directory}");
+
+	public function __construct ($baseDirectory) {
+		$this->baseDirectory = $baseDirectory;
+	}
+
+
+	public function getWardrobe () {
+		$iterator = new DirectoryIterator($this->baseDirectory);
+		$layer = false;
+		foreach ($iterator as $i) {
+
+			if ($i->isDot() || !$i->isDir()) continue;
+
+			$directory = $i->getFileName();
+			$layerDir = new DirectoryIterator($this->baseDirectory."/{$directory}");
 	
-	$items[$directory] = [];
-	foreach ($layerDir as $l) {
-		if ($l->isDot() || $l->isDir()) continue;
-		$items[$directory][] = $l->getFileName();
+			$items[$directory] = [];
+			foreach ($layerDir as $l) {
+				if ($l->isDot() || $l->isDir()) continue;
+				$items[$directory][] = $l->getFileName();
 
+			}
+
+		}	
+		ksort($items);
+		return $items;
+	}
+
+	public function render ($layers) {
+		$final_image = imagecreatefrompng($this->baseDirectory.'/002-base/skin001.png');
+		foreach ($_POST['layers'] as $key => $value) {
+			$image2 = imagecreatefrompng($value);
+			imagecopy($final_image, $image2, 0, 0, 0, 0, 80, 100);
+		}
+		imagealphablending($final_image, false);
+		imagesavealpha($final_image, true);
+		header("Content-Type: image/png");
+		imagepng($final_image);
+		exit;
 	}
 
 }
 
+
+
+
+$dynamicAvatar = new DynamicAvatar('./assets/layers/');
+# Build and Output Final Image
+if (isset($_POST['build'])) {
+	$dynamicAvatar->render($_POST['layers'] ?? []);
+}
+
+
+$items = $dynamicAvatar->getWardrobe();
 
 foreach ($items as $layer => $item) {
 
@@ -30,16 +69,16 @@ foreach ($items as $layer => $item) {
 HTML;
 	$content = [];
 	foreach ($item as $item_name) {
-		$content[] = <<<HTML
+		$content[$item_name] = <<<HTML
 	<img src="./assets/layers/{$layer}/{$item_name}" data-target = "{$layer}" class="js-item" />
 HTML;
 
 	}	
+	asort($content);
 	$content = implode('', $content);
-
 	$visual[$layer] = <<<HTML
 	<img src="./assets/layers/{$layer}/{$item[0]}" class="layer-current"/>
-	<input type="hidden" name="{$layer}" value="./assets/layers/{$layer}/{$item[0]}" />
+	<input type="hidden" name="layers[]" value="./assets/layers/{$layer}/{$item[0]}" />
 HTML;
 
 	$sections[$layer] = <<<HTML
@@ -48,8 +87,6 @@ HTML;
 HTML;
 
 }
-
-
 $tabs = implode('', $tabs);
 $sections = implode('', $sections);
 $visual = implode('' ,$visual);
@@ -57,14 +94,17 @@ $visual = implode('' ,$visual);
 echo <<<HTML
 <link rel="stylesheet" media="screen" href="https://toolkit.chris-shaw.com/css/toolkit.css" />
 
+<form method="post">
 <div class="display">
 {$visual}
+<br />
+<br />
+<br />
+<br />
+<br />
 </div>
-<br />
-<br />
-<br />
-<br />
-<br />
+<input type="submit" name="build" value="Build" />
+</form>
 <div class="o-tabs c-tabs">
 	{$tabs}
 	{$sections}
@@ -82,4 +122,19 @@ echo <<<HTML
 
 
 </style>
+
+<script>
+let items = document.querySelectorAll('.js-item');
+
+
+items.forEach(function(e) {
+    e.addEventListener("click", function() {
+    
+    
+    	alert('x');
+    });
+});
+
+
+</script>
 HTML;
