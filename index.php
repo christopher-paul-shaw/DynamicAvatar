@@ -36,6 +36,10 @@ class DynamicAvatar {
 	public function render ($layers) {
 		$final_image = imagecreatefrompng($this->baseDirectory.'/002-base/skin001.png');
 		foreach ($_POST['layers'] as $key => $value) {
+			$parts = parse_url($value);
+
+
+			$value = isset($parts['host']) ? '.'.$parts['path'] : $parts['path'];
 			$image2 = imagecreatefrompng($value);
 			imagecopy($final_image, $image2, 0, 0, 0, 0, 80, 100);
 		}
@@ -50,7 +54,6 @@ class DynamicAvatar {
 
 
 
-
 $dynamicAvatar = new DynamicAvatar('./assets/layers/');
 # Build and Output Final Image
 if (isset($_POST['build'])) {
@@ -62,9 +65,9 @@ $items = $dynamicAvatar->getWardrobe();
 ksort($items);
 foreach ($items as $layer => $item) {
 
-	$label = explode('-',$layer)[1];
+	$label = ucwords(explode('-',$layer)[1]);
 	$tabs[$layer] = <<<HTML
-		<label for="{$layer}" class="o-tabs__label c-tabs__label">
+		<label for="{$layer}" class="tab-label">
 			{$label}
 		</label>
 HTML;
@@ -86,8 +89,8 @@ HTML;
 HTML;
 
 	$sections[$layer] = <<<HTML
-	<input type="radio" class="o-tabs__toggle" name="tabs" id="{$layer}" checked="">
-        <div class="o-tabs__tab c-tabs__tab u-padding--medium">{$content}</div>
+	<input type="radio" class="tab-toggle" name="tabs" id="{$layer}" checked="">
+        <div class="tab">{$content}</div>
 HTML;
 
 }
@@ -101,13 +104,10 @@ echo <<<HTML
 <form method="post">
 <div class="display">
 {$visual}
-<br />
-<br />
-<br />
-<br />
-<br />
 </div>
-<input type="submit" name="build" value="Build" />
+<div class="controls">
+	<input type="submit" name="build" value="Build" />
+</div>
 </form>
 <div class="o-tabs c-tabs">
 	{$tabs}
@@ -116,8 +116,31 @@ echo <<<HTML
 
 
 <style>
-	.display { width: 80px; marign: 200px; border: 1px solid red; }
 
+	.tab-toggle:checked + .tab {
+		display: block;
+	}
+
+	.tab, .tab-toggle {
+		display: none;
+	}
+
+	.tab {
+		border: 1px solid #ccc;
+	}
+
+	.tab-label {
+		border: 1px solid #ccc;
+		border-bottom: 0;
+		margin: 0 4px 0 0;
+		padding: 10px;
+		display: inline-block;
+	}	
+	.display { display: block; position: relative; width: 80px; height: 100px; margin:  auto; border: 1px solid red; }
+	.controls { margin: 10px auto; }
+	body {
+		text-align: center;
+	}
 	.layer-current {
 		position: absolute;
 		top: 0;
