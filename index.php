@@ -99,7 +99,6 @@ $sections = implode('', $sections);
 $visual = implode('' ,$visual);
 
 echo <<<HTML
-<link rel="stylesheet" media="screen" href="https://toolkit.chris-shaw.com/css/toolkit.css" />
 
 <form method="post">
 <div class="display">
